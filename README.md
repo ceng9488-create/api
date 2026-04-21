@@ -7,8 +7,9 @@ A RESTful API for managing teacher-student registrations, built with NestJS, Pri
 - **Framework**: NestJS (TypeScript)
 - **ORM**: Prisma
 - **Database**: MySQL
-- **Validation**: class-validator
-- **API Docs**: Swagger (available at `/docs`)
+- **Auth**: JWT (Passport)
+- **Validation**: class-validator / class-transformer
+- **API Docs**: Swagger
 
 ## Prerequisites
 
@@ -26,17 +27,24 @@ npm install
 
 2. **Configure environment**
 
-Create a `.env` file in the project root:
+Copy `.env.example` to `.env` and fill in your values:
+
+```bash
+cp .env.example .env
+```
 
 ```env
 DATABASE_URL="mysql://USER:PASSWORD@HOST:PORT/DATABASE"
-PORT=3002
+JWT_SECRET="your-secret-key"
+PORT=29151
+ADMIN_EMAIL="admin@gmail.com"
+ADMIN_PASSWORD="your-password"
 ```
 
 3. **Run database migrations**
 
 ```bash
-npx prisma migrate dev
+npx prisma migrate deploy
 ```
 
 4. **Generate Prisma client**
@@ -48,48 +56,32 @@ npx prisma generate
 ## Running the App
 
 ```bash
-# development
-npm run start
-
-# watch mode (auto-reload)
+# development (watch mode)
 npm run start:dev
 
 # production
 npm run start:prod
 ```
 
-The server starts on `http://localhost:3002`.  
-Swagger docs are available at `http://localhost:3002/docs`.
+The server starts on `http://localhost:PORT`.  
+Swagger docs: **http://localhost:PORT/api**
 
+## API Endpoints
 
-## Database Schema
+All endpoints (except login) require a Bearer token in the `Authorization` header.
 
-```
-Teacher
-  id              Int      (PK, auto-increment)
-  email           String   (unique)
-  createdDateTime DateTime (auto: created at)
-  updatedDateTime DateTime (auto: updated at)
-  students        Student[] (many-to-many)
+### Auth
 
-Student
-  id              Int      (PK, auto-increment)
-  email           String   (unique)
-  suspended       Boolean  (default: false)
-  createdDateTime DateTime (auto: created at)
-  updatedDateTime DateTime (auto: updated at)
-  teachers        Teacher[] (many-to-many)
-```
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| POST | `/api/auth/login` | Login and get access token |
 
-## Tests
+### Registration
 
-```bash
-# unit tests
-npm run test
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| POST | `/api/register` | Register students under a teacher |
+| GET | `/api/commonstudents` | Get students common to given teachers |
+| POST | `/api/suspend` | Suspend a student |
+| POST | `/api/retrievefornotifications` | Get notification recipients |
 
-# watch mode
-npm run test:watch
-
-# coverage report
-npm run test:cov
-```
