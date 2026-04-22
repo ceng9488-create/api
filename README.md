@@ -41,9 +41,7 @@ npm install
 
 Copy `.env.example` to `.env` and fill in your values:
 
-```bash
-cp .env.example .env
-```
+or replace the value in .env
 
 ```env
 DATABASE_URL="mysql://USER:PASSWORD@HOST:PORT/DATABASE"
@@ -87,49 +85,3 @@ All endpoints except `/auth/login` require a Bearer token in the `Authorization`
 | POST | `/api/suspend` | Suspend a student |
 | POST | `/api/retrievefornotifications` | Get notification recipients |
 
-## Database Schema
-
-```
-Teacher
-  id              String   (PK, UUID)
-  email           String   (unique)
-  createdDateTime DateTime
-  updatedDateTime DateTime
-
-Student
-  id              String   (PK, UUID)
-  email           String   (unique)
-  suspended       Boolean  (default: false)
-  createdDateTime DateTime
-  updatedDateTime DateTime
-
-Registration
-  id              String   (PK, UUID)
-  teacherId       String   (FK -> Teacher)
-  studentId       String   (FK -> Student)
-  createdDateTime DateTime
-
-Notification
-  id              String   (PK, UUID)
-  teacherId       String   (FK -> Teacher)
-  message         String
-  sentAt          DateTime
-
-NotificationRecipient
-  id              String   (PK, UUID)
-  notificationId  String   (FK -> Notification)
-  studentId       String   (FK -> Student)
-```
-
-## Tests
-
-```bash
-# unit tests
-npm test
-
-# watch mode
-npm run test:watch
-
-# coverage report
-npm run test:cov
-```
