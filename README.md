@@ -2,6 +2,11 @@
 
 A RESTful API for managing teacher-student registrations, built with NestJS, Prisma, and MySQL.
 
+## Hosted API
+
+- **Base URL**: https://api-production-362a.up.railway.app/api
+- **Swagger Docs**: https://api-production-362a.up.railway.app/api#/
+
 ## Tech Stack
 
 - **Framework**: NestJS (TypeScript)
@@ -17,15 +22,22 @@ A RESTful API for managing teacher-student registrations, built with NestJS, Pri
 - MySQL database
 - npm
 
-## Setup
+## Running Locally
 
-1. **Install dependencies**
+1. **Clone the repository**
+
+```bash
+git clone https://github.com/ceng9488-create/api.git
+cd api
+```
+
+2. **Install dependencies**
 
 ```bash
 npm install
 ```
 
-2. **Configure environment**
+3. **Configure environment**
 
 Copy `.env.example` to `.env` and fill in your values:
 
@@ -41,40 +53,30 @@ ADMIN_EMAIL="admin@gmail.com"
 ADMIN_PASSWORD="your-password"
 ```
 
-3. **Run database migrations**
+4. **Run database migrations**
 
 ```bash
 npx prisma migrate deploy
 ```
 
-4. **Generate Prisma client**
+5. **Start the server**
 
 ```bash
-npx prisma generate
-```
-
-## Running the App
-
-```bash
-# development (watch mode)
 npm run start:dev
-
-# production
-npm run start:prod
 ```
 
-The server starts on `http://localhost:PORT`.  
-Swagger docs: **http://localhost:PORT/api**
+The server will start at `http://localhost:29151`.  
+Swagger docs available at `http://localhost:29151/api`.
 
 ## API Endpoints
 
-All endpoints (except login) require a Bearer token in the `Authorization` header.
+All endpoints except `/auth/login` require a Bearer token in the `Authorization` header.
 
 ### Auth
 
 | Method | Endpoint | Description |
 |--------|----------|-------------|
-| POST | `/api/auth/login` | Login and get access token |
+| POST | `/api/auth/login` | Login and receive access token |
 
 ### Registration
 
@@ -85,3 +87,49 @@ All endpoints (except login) require a Bearer token in the `Authorization` heade
 | POST | `/api/suspend` | Suspend a student |
 | POST | `/api/retrievefornotifications` | Get notification recipients |
 
+## Database Schema
+
+```
+Teacher
+  id              String   (PK, UUID)
+  email           String   (unique)
+  createdDateTime DateTime
+  updatedDateTime DateTime
+
+Student
+  id              String   (PK, UUID)
+  email           String   (unique)
+  suspended       Boolean  (default: false)
+  createdDateTime DateTime
+  updatedDateTime DateTime
+
+Registration
+  id              String   (PK, UUID)
+  teacherId       String   (FK -> Teacher)
+  studentId       String   (FK -> Student)
+  createdDateTime DateTime
+
+Notification
+  id              String   (PK, UUID)
+  teacherId       String   (FK -> Teacher)
+  message         String
+  sentAt          DateTime
+
+NotificationRecipient
+  id              String   (PK, UUID)
+  notificationId  String   (FK -> Notification)
+  studentId       String   (FK -> Student)
+```
+
+## Tests
+
+```bash
+# unit tests
+npm test
+
+# watch mode
+npm run test:watch
+
+# coverage report
+npm run test:cov
+```
